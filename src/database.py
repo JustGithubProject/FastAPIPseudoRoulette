@@ -1,10 +1,12 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 
-from config import Config
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{Config.USERNAME}:{Config.PASSWORD}@{Config.HOST}/{Config.DB_NAME}"
+
+from src.config import Config
+
+
+SQLALCHEMY_DATABASE_URL = f'mysql://{Config.USERNAME}:{Config.PASSWORD}@{Config.HOST}:{Config.PORT}/{Config.DB_NAME}'
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -17,3 +19,4 @@ def get_db():
         yield db
     except:
         db.close()
+
