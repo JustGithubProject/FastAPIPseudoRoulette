@@ -4,14 +4,15 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-
+from dotenv import load_dotenv
 from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 from src.database import Base
 
-sys.path.append(os.path.join(sys.path[0], 'src'))
+
+load_dotenv()
 
 config = context.config
 
