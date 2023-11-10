@@ -17,8 +17,8 @@ load_dotenv()
 config = context.config
 
 section = config.config_ini_section
-config.set_section_option(section, "USERNAME", str(os.environ.get("USERNAME")))
-config.set_section_option(section, "PASSWORD", str(os.environ.get("PASSWORD")))
+config.set_section_option(section, "USERNAME", str(os.environ.get("DB_USER")))
+config.set_section_option(section, "PASSWORD", str(os.environ.get("DB_PASSWORD")))
 config.set_section_option(section, "DB_NAME", str(os.environ.get("DB_NAME")))
 config.set_section_option(section, "PORT", str(os.environ.get("PORT")))
 config.set_section_option(section, "HOST", str(os.environ.get("HOST")))

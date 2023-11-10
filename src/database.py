@@ -5,9 +5,15 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from src.config import Config
+from src.config import (
+    USERNAME,
+    PASSWORD,
+    HOST,
+    PORT,
+    DB_NAME
+)
 
-SQLALCHEMY_DATABASE_URL = f'postgresql+asyncpg://{Config.USERNAME}:{Config.PASSWORD}@{Config.HOST}:{Config.PORT}/{Config.DB_NAME}'
+SQLALCHEMY_DATABASE_URL = f'postgresql+asyncpg://{USERNAME}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}'
 
 
 Base = declarative_base()
