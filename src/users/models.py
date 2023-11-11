@@ -7,3 +7,5 @@ class User(Base):
     __tablename__ = "users"
     id = sql.Column(sql.Integer, primary_key=True)
     username = sql.Column(sql.String, nullable=False)
+    hashed_password = sql.Column(sql.String, nullable=False)
+

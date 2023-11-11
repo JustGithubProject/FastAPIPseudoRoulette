@@ -8,4 +8,5 @@ class UserGet(BaseModel):
 
 class UserCreate(BaseModel):
     username: str
+    password: str
 
