@@ -1,3 +1,5 @@
+from typing import Optional
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -10,10 +12,16 @@ class UserRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def find_user_by_username_(self, username: str) -> User:
+    async def get_list_of_users(self):
+        query = select(User)
+        result = await self.session.execute(query)
+        items = result.scalars().all()
+        return items
+
+    async def find_user_by_username_(self, username: str) -> Optional[User]:
         stmt = select(User).where(User.username == username)
         result = await self.session.execute(stmt)
-        user = await result.scalar()
+        user = result.scalar()
         return user
 
     async def create_user_(self, user_data: UserCreate) -> User:
