@@ -4,6 +4,7 @@ from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import status
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt
 from pydantic import ValidationError
@@ -27,41 +28,24 @@ async def get_user_repository(session: AsyncSession = Depends(get_async_session)
 
 async def get_current_user(token: str = Depends(reuseable_oauth),
                            user_repository: UserRepository = Depends(get_user_repository)) -> UserGet:
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"}
+    )
     try:
-        payload = jwt.decode(
-            token, JWT_SECRET_KEY, algorithms=[ALGORITHM]
-        )
-        token_data = TokenPayload(**payload)
-        print(payload)
-        print(token_data)
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if not username:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
 
-        if datetime.fromtimestamp(token_data.exp) < datetime.now():
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token expired",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-    except(jwt.JWTError, ValidationError):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    user = await user_repository.find_user_by_username_(username)
+    if not user:
+        raise credentials_exception
 
-    user = await user_repository.find_user_by_username_("Kropi")
-
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Could not find user",
-        )
-
-    return UserGet(**user)
+    return user
 
 
-async def main():
-    result = await get_current_user(
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTk4NjAyNjIsInN1YiI6Iktyb3BpIn0.gizhzLPlDOFfTmYd5Lbh5pJXb_awtatVA4QIWdMG0io")
-    print(result)
 
-asyncio.run(main())
