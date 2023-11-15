@@ -6,6 +6,7 @@ import datetime
 
 
 class RouletteRound(Base):
+    """Эта модель представляет собой отдельный раунд игры в рулетку."""
     __tablename__ = "roulette_rounds"
 
     round_id = sql.Column(sql.Integer, primary_key=True)
@@ -16,6 +17,7 @@ class RouletteRound(Base):
 
 
 class RouletteSpin(Base):
+    """Эта модель представляет собой конкретный спин (вращение) рулетки в рамках определенного раунда."""
     __tablename__ = "roulette_spins"
     spin_id = sql.Column(sql.Integer, primary_key=True)
     round_id = sql.Column(sql.Integer, sql.ForeignKey("roulette_rounds.round_id"))
@@ -27,6 +29,7 @@ class RouletteSpin(Base):
 
 
 class RouletteCell(Base):
+    """Эта модель представляет отдельную ячейку рулетки."""
     __tablename__ = "roulette_cells"
 
     cell_id = sql.Column(sql.Integer, primary_key=True)
