@@ -15,8 +15,4 @@ class UserLogin(UserCreate):
     pass
 
 
-class TokenPayload(BaseModel):
-    sub: str  # subject
-    exp: int  # expiration time
-    username: str
 

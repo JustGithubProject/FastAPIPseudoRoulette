@@ -40,6 +40,7 @@ async def create_user(user_data: UserCreate, user_repository: UserRepository = D
 
 @router_user.post("/api/login/user")
 async def login(request: Request, user_data: UserLogin, user_repository: UserRepository = Depends(get_user_repository)):
+    """Login for user to get access_token and refresh_token"""
     existing_user = await user_repository.find_user_by_username_(user_data.username)
     if not existing_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email or password")

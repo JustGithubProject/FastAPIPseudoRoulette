@@ -12,7 +12,7 @@ from pydantic import ValidationError
 from src.users.services import UserRepository
 from src.users.utils import ALGORITHM
 from src.users.utils import JWT_SECRET_KEY
-from src.users.schemas import TokenPayload
+
 from src.users.schemas import UserGet
 from src.database import get_async_session
 
