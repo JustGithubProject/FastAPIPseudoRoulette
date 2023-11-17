@@ -11,7 +11,7 @@ class RouletteRound(Base):
 
     round_id = sql.Column(sql.Integer, primary_key=True)
     timestamp = sql.Column(sql.DateTime, default=datetime.datetime.utcnow)
-    jackpot_cell_id = sql.Column(sql.Integer, sql.ForeignKey("roulette_cells.cell_id"))
+    jackpot_cell_id = sql.Column(sql.Integer, sql.ForeignKey("roulette_cells.cell_id"), default=1)
 
     jackpot_cell = relationship("RouletteCell")
 
