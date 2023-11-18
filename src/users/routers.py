@@ -1,7 +1,8 @@
 from fastapi import (
     APIRouter,
     Request,
-    Depends
+    Depends,
+    Response
 )
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -39,7 +40,7 @@ async def create_user(user_data: UserCreate, user_repository: UserRepository = D
 
 
 @router_user.post("/api/login/user")
-async def login(request: Request, user_data: UserLogin, user_repository: UserRepository = Depends(get_user_repository)):
+async def login(response: Response, user_data: UserLogin, user_repository: UserRepository = Depends(get_user_repository)):
     """Login for user to get access_token and refresh_token"""
     existing_user = await user_repository.find_user_by_username_(user_data.username)
     if not existing_user:
@@ -50,6 +51,7 @@ async def login(request: Request, user_data: UserLogin, user_repository: UserRep
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     access_token = create_access_token(existing_user.username)
     refresh_token = create_refresh_token(existing_user.username)
+    response.headers["Authorization"] = access_token
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,
