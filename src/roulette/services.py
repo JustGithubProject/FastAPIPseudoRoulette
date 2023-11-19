@@ -58,6 +58,12 @@ class RouletteRoundRepository:
         await self.session.refresh(roulette_round_obj)
         return roulette_round_obj
 
+    async def get_roulette_round_by_round_id(self, r_id: int):
+        stmt = select(RouletteRound).where(RouletteRound.round_id == r_id)
+        result = await self.session.execute(stmt)
+        item = result.first()
+        return item
+
     async def get_list_roulette_round_(self):
         stmt = select(RouletteRound)
         result = await self.session.execute(stmt)
