@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from src.roulette.models import RouletteSpin
 from src.roulette.schemas import RouletteCellCreate
@@ -25,6 +26,12 @@ class RouletteCellRepository:
         result = await self.session.execute(stmt)
         items = result.scalars().all()
         return items
+
+    async def get_roulette_cell_by_id(self, cell_id: int):
+        stmt = select(RouletteCell).where(RouletteCell.cell_id == cell_id)
+        result = await self.session.execute(stmt)
+        roulette_cell = result.scalar_one_or_none()
+        return roulette_cell
 
 
 class RouletteSpinRepository:
@@ -59,9 +66,11 @@ class RouletteRoundRepository:
         return roulette_round_obj
 
     async def get_roulette_round_by_round_id(self, r_id: int):
-        stmt = select(RouletteRound).where(RouletteRound.round_id == r_id)
+        stmt = select(RouletteRound).options(
+            selectinload(RouletteRound.jackpot_cell)
+        ).where(RouletteRound.round_id == r_id)
         result = await self.session.execute(stmt)
-        item = result.first()
+        item = result.scalars().first()
         return item
 
     async def get_list_roulette_round_(self):
