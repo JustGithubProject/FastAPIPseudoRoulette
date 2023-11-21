@@ -9,6 +9,7 @@ from src.roulette.services import RouletteRoundRepository
 from src.roulette.schemas import RouletteCellCreate
 from src.roulette.schemas import RouletteSpinCreate
 from src.roulette.services import RouletteCellRepository
+from src.database import clear_table_and_reset_autoincrement
 from src.database import get_async_session
 from src.roulette.services import RouletteSpinRepository
 
@@ -75,22 +76,23 @@ async def spin_roulette(
     try:
         if roulette_spin.round_id == 1:
             list_cells_temp = await roulette_cells_repository.get_list_roulette_cells_()
-            list_cells = [i.cell_id for i in list_cells_temp]
-            list_weight = [i.weight for i in list_cells_temp]
-            roulette_result = random.choices(list_cells, list_weight)[0]
+            roulette_results = random.choices(list_cells_temp, weights=[cell.weight for cell in list_cells_temp], k=1)
+            roulette_result = roulette_results[0].cell_id
         else:
             list_cells_temp = await roulette_cells_repository.get_list_roulette_cells_()
-            except_list_cells = []
+            except_list_cells = set()
             except_list_weight = []
             for i in range(1, int(roulette_spin.round_id)):
                 roulette_r = await roulette_round_repository.get_roulette_round_by_round_id(i)
-                except_list_cells.append(roulette_r.jackpot_cell_id)
+                except_list_cells.add(roulette_r.jackpot_cell_id)
                 roulette_cell = await roulette_cells_repository.get_roulette_cell_by_id(roulette_r.jackpot_cell_id)
                 except_list_weight.append(roulette_cell.weight)
 
-            list_cells = [i.cell_id for i in list_cells_temp if i.cell_id not in except_list_cells]
-            list_weight = [i.weight for i in list_cells_temp if i.weight not in except_list_weight]
-            roulette_result = random.choices(list_cells, list_weight)[0]
+            filtered_cells = [cell for cell in list_cells_temp if cell.cell_id not in except_list_cells]
+            filtered_weights = [cell.weight for cell in list_cells_temp if cell.cell_id not in except_list_cells]
+
+            roulette_results = random.choices(filtered_cells, weights=filtered_weights, k=1)
+            roulette_result = roulette_results[0].cell_id
 
         await roulette_spin_repository.create_roulette_spin_(roulette_spin)
 
@@ -99,10 +101,19 @@ async def spin_roulette(
             roulette_r.jackpot_cell_id = roulette_result
             await session.commit()
         else:
-            print("Could find roulette_r")
+            print("Could not find roulette_r")
     except Exception as e:
         # Log the exception or print for debugging
         print(f"Error: {e}")
         return {"error": str(e)}
 
     return {"roulette_result": roulette_result}
+
+
+@router_roulette.get("/api/reset/{table_name}")
+async def reset_table_data(table_name: str):
+    try:
+        await clear_table_and_reset_autoincrement(table_name)
+        return {"status_code": 200}
+    except Exception as ex:
+        return {"error": ex}
