@@ -31,16 +31,6 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
-async def clear_table_and_reset_autoincrement(table_name):
-    async with async_session_maker() as session:
-        # Удаляем данные из таблицы
-        table = Table(table_name, Base.metadata, autoload_with=engine)
-        delete_stmt = table.delete()
-        await session.execute(delete_stmt)
 
-        # Сбрасываем счетчик автоинкремента
-        sequence_name = f"{table_name}_id_seq"
-        reset_sequence_sql = text(f"ALTER SEQUENCE {sequence_name} RESTART WITH 1")
-        await session.execute(reset_sequence_sql)
 
 

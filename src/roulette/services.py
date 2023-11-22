@@ -50,6 +50,12 @@ class RouletteSpinRepository:
         await self.session.refresh(roulette_spin_obj)
         return roulette_spin_obj
 
+    async def get_list_roulette_spin_(self):
+        stmt = select(RouletteSpin)
+        result = await self.session.execute(stmt)
+        items = result.scalars().all()
+        return items
+
 
 class RouletteRoundRepository:
     """Repository to work with RouletteRound"""
