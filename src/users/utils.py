@@ -26,14 +26,17 @@ password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def get_hashed_password(password: str) -> str:
+    """a function that receives a password and returns the hashed password"""
     return password_context.hash(password)
 
 
 def verify_password(password: str, hashed_password: str) -> bool:
+    """a function that receives a password and a hashed password to verify them"""
     return password_context.verify(password, hashed_password)
 
 
 def create_access_token(subject: Union[str, Any], expires_delta: int = None) -> str:
+    """a function to create access_token"""
     if expires_delta is not None:
         expires_delta = datetime.utcnow() + expires_delta
     else:
@@ -45,6 +48,7 @@ def create_access_token(subject: Union[str, Any], expires_delta: int = None) -> 
 
 
 def create_refresh_token(subject: Union[str, Any], expires_delta: int = None) -> str:
+    """a function to create refresh_token"""
     if expires_delta is not None:
         expires_delta = datetime.utcnow() + expires_delta
     else:
